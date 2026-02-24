@@ -13,3 +13,5 @@ dmypy.json
 dist
 
 .env
+
+conf.toml
