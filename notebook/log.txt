@@ -46,3 +46,5 @@
 2026-02-24 14:39:57.647 | DEBUG    | circinus.components:index_store_component:80 - Local index store not found, creating a new one
 2026-02-24 14:42:21.154 | DEBUG    | circinus.components:doc_store_component:88 - Local document store not found, creating a new one
 2026-02-24 14:42:21.155 | DEBUG    | circinus.components:index_store_component:80 - Local index store not found, creating a new one
+2026-02-24 14:44:27.448 | DEBUG    | circinus.components:doc_store_component:88 - Local document store not found, creating a new one
+2026-02-24 14:44:27.448 | DEBUG    | circinus.components:index_store_component:80 - Local index store not found, creating a new one
