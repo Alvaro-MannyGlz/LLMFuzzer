@@ -1,11 +1,11 @@
 import random
 from pathlib import Path
 
-from attrs import define
+from attrs import define, field
 
 from circinus.fuzzer import UserInput, candidate_prompt, fuzzing_loop
 from circinus.knowledge_base import ChunkDTO, init_knowledge_base
-from circinus.llm import GPT
+from circinus.components import llm_component
 from circinus.vector_store import ContextFilter
 
 
@@ -44,10 +44,15 @@ class Source:
         ])
 
 
+@define
 class Agent:
-    def __init__(self, config):
-        self._llm = GPT()
-        self.knowledge_base = init_knowledge_base(config)
+    config: object
+    _llm: object = field(init=False)
+    knowledge_base: object = field(init=False)
+
+    def __attrs_post_init__(self):
+        self._llm = llm_component(self.config)
+        self.knowledge_base = init_knowledge_base(self.config)
 
     def search_in_docs(self):
         pass
@@ -95,4 +100,8 @@ class Agent:
         )
 
         for prompt in prompts:
-            yield from fuzzing_loop(llm=self._llm, prompt=prompt)
+            yield from fuzzing_loop(
+                llm=self._llm,
+                prompt=prompt,
+                generation_prompt=GENERATION_PROMPT,
+            )

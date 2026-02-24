@@ -4,14 +4,27 @@
 
 # Environments
 venv/
+.venv/
 
 # mypy
 .mypy_cache/
 .dmypy.json
 dmypy.json
 
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Build artifacts
+build/
+*.egg-info/
+
+# VS Code
+.vscode/
+
 dist
 
 .env
 
 conf.toml
+notebook/conf.toml

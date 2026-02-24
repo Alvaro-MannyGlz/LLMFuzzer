@@ -7,13 +7,13 @@ from llama_index import (
     Document,
     ServiceContext,
     StorageContext,
-    StringIterableReader,
     VectorStoreIndex,
     load_index_from_storage,
 )
 from llama_index.embeddings.base import BaseEmbedding
-from llama_index.llms.base import LLM
+from llama_index.llms.llm import LLM
 from llama_index.node_parser import SentenceWindowNodeParser
+from llama_index.readers.string_iterable import StringIterableReader
 from llama_index.readers.file.base import DEFAULT_FILE_READER_CLS
 from llama_index.schema import NodeWithScore
 from llama_index.storage.docstore import BaseDocumentStore

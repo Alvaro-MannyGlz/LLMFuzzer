@@ -29,10 +29,12 @@ class UserInput:
 
 
 def candidate_prompt(llm: GPT, user_input: UserInput, num_samples: int = 3) -> list[str]:
-    llm.temperature = 0
+    if hasattr(llm, 'temperature'):
+        llm.temperature = 0
     greedy_prompt = llm.ask('\n'.join([SUMMARIZE_PROMPT, str(user_input)]))
 
-    llm.temperature = 1
+    if hasattr(llm, 'temperature'):
+        llm.temperature = 1
     diverse_prompt = [
         llm.ask('\n'.join([SUMMARIZE_PROMPT, str(user_input)]))
         for _ in range(num_samples)
@@ -43,7 +45,8 @@ def candidate_prompt(llm: GPT, user_input: UserInput, num_samples: int = 3) -> l
 
 def fuzzing_loop(llm: GPT, prompt: str, generation_prompt) -> list[str]:
     result = []
-    llm.temperature = 1
+    if hasattr(llm, 'temperature'):
+        llm.temperature = 1
 
     program = llm.ask('\n'.join([generation_prompt, prompt]))
     result.append(code_snippet := extract_code(program))
