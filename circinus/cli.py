@@ -4,6 +4,14 @@ import click
 
 from circinus.fuzzer import UserInput, candidate_prompt, fuzzing_loop
 from circinus.llm import GPT
+from circinus.settings import load_config
+
+
+def _default_config_path() -> Path:
+    notebook_config = Path('notebook/conf.toml')
+    if notebook_config.exists():
+        return notebook_config
+    return Path('conf.toml')
 
 
 @click.command()
@@ -33,7 +41,15 @@ from circinus.llm import GPT
     type=click.Path(file_okay=False, resolve_path=True),
     help='Output directory.'
 )
-def cli(documentation: str, specification: str, code: str, samples: int, output: str) -> None:
+@click.option(
+    '--config',
+    type=click.Path(dir_okay=False, resolve_path=True),
+    default=str(_default_config_path()),
+    show_default=True,
+    help='Path to Dynaconf TOML config file.',
+)
+def cli(documentation: str, specification: str, code: str, samples: int, output: str, config: str) -> None:
+    load_config(config)
     llm = GPT()
 
     prompts = candidate_prompt(

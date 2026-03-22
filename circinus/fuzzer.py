@@ -1,7 +1,6 @@
 import random
 import time
 from itertools import chain
-from typing import Optional
 
 from attrs import define
 
@@ -14,27 +13,27 @@ circinus_random = random.Random(time.process_time())
 
 SUMMARIZE_PROMPT = """
 Please summarize the above information in a concise manner to describe the usage and functionality of the target."""
-GENERATION_MUTATE_PROMPT = 'Program:\n {generation}.\n Please create a mutated program that modifiers this program.'
+DEFAULT_GENERATION_PROMPT = (
+    'Please create a program which uses random class according to the following description'
+)
 GENERATION_SEMANTIC_EQUIP = 'Program:\n {generation}.\n Please create a semantically equivalent program to this program'
 
 
 @define
 class UserInput:
-    documentation: Optional[str]
-    specification: Optional[str]
-    code: Optional[str]
+    documentation: str | None
+    specification: str | None
+    code: str | None
 
     def __str__(self):
         return '\n'.join(filter(None, [self.documentation, self.specification, self.code]))
 
 
 def candidate_prompt(llm: GPT, user_input: UserInput, num_samples: int = 3) -> list[str]:
-    if hasattr(llm, 'temperature'):
-        llm.temperature = 0
+    llm.temperature = 0
     greedy_prompt = llm.ask('\n'.join([SUMMARIZE_PROMPT, str(user_input)]))
 
-    if hasattr(llm, 'temperature'):
-        llm.temperature = 1
+    llm.temperature = 1
     diverse_prompt = [
         llm.ask('\n'.join([SUMMARIZE_PROMPT, str(user_input)]))
         for _ in range(num_samples)
@@ -43,10 +42,13 @@ def candidate_prompt(llm: GPT, user_input: UserInput, num_samples: int = 3) -> l
     return list(chain([greedy_prompt], diverse_prompt))
 
 
-def fuzzing_loop(llm: GPT, prompt: str, generation_prompt) -> list[str]:
+def fuzzing_loop(
+    llm: GPT,
+    prompt: str,
+    generation_prompt: str = DEFAULT_GENERATION_PROMPT,
+) -> list[str]:
     result = []
-    if hasattr(llm, 'temperature'):
-        llm.temperature = 1
+    llm.temperature = 1
 
     program = llm.ask('\n'.join([generation_prompt, prompt]))
     result.append(code_snippet := extract_code(program))

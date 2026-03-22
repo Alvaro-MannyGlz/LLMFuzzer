@@ -25,6 +25,23 @@ build/
 dist
 
 .env
+.env.*
 
+# Local config and secrets
 conf.toml
 notebook/conf.toml
+*.local.toml
+
+# Runtime data stores
+data/
+circinus/chroma_db/
+*.sqlite3
+*.db
+
+# Logs
+log.txt
+notebook/log.txt
+*.log
+
+# Notebook artifacts
+.ipynb_checkpoints/

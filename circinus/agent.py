@@ -5,7 +5,7 @@ from attrs import define, field
 
 from circinus.fuzzer import UserInput, candidate_prompt, fuzzing_loop
 from circinus.knowledge_base import ChunkDTO, init_knowledge_base
-from circinus.components import llm_component
+from circinus.llm import GPT
 from circinus.vector_store import ContextFilter
 
 
@@ -51,11 +51,8 @@ class Agent:
     knowledge_base: object = field(init=False)
 
     def __attrs_post_init__(self):
-        self._llm = llm_component(self.config)
+        self._llm = GPT(config=self.config)
         self.knowledge_base = init_knowledge_base(self.config)
-
-    def search_in_docs(self):
-        pass
 
     def add_docs(self, file_name: str, file_data: str | bytes, type_) -> None:
         self.knowledge_base.add(file_name, file_data, type_)

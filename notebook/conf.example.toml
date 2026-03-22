@@ -1,0 +1,16 @@
+openrouter_api_key='${OPENROUTER_API_KEY}'
+# Free-tier chat model (recommended default)
+openrouter_api_model='mistralai/mistral-7b-instruct:free'
+# Free alternatives you can try:
+# openrouter_api_model='google/gemma-2-9b-it:free'
+openrouter_fallback_models=[
+  'meta-llama/llama-3.1-8b-instruct:free',
+  'google/gemma-2-9b-it:free'
+]
+
+# Keep this aligned with OpenRouter availability for embeddings in your account.
+openrouter_embedding_model='nomic-ai/nomic-embed-text-v1.5'
+openrouter_base_url='https://openrouter.ai/api/v1'
+openrouter_site_url='https://github.com/PrVrSs/circinus'
+openrouter_site_name='circinus'
+max_tokens=2048
