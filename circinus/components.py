@@ -14,36 +14,41 @@ from circinus.logger import logger
 Base = (Path(__file__).parent.parent / 'data').resolve(strict=True)
 
 
-def _openrouter_llm(config) -> LLM:
+def _compatible_llm(config) -> LLM:
     return OpenAI(
-        api_key=config.openrouter_api_key,
-        api_base=config.openrouter_base_url,
-        model=config.openrouter_api_model,
-        default_headers={
-            'HTTP-Referer': config.openrouter_site_url,
-            'X-Title': config.openrouter_site_name,
-        },
+        api_key=getattr(config, 'llm_api_key', 'ollama'),
+        api_base=getattr(config, 'llm_base_url', 'http://localhost:11434/v1'),
+        model=getattr(config, 'llm_model', 'llama3.1'),
+        default_headers=_compatible_headers(config),
     )
 
 
-def _openrouter_embedding(config) -> BaseEmbedding:
+def _compatible_headers(config) -> dict[str, str]:
+    headers = {}
+    site_url = getattr(config, 'llm_site_url', None)
+    site_name = getattr(config, 'llm_site_name', None)
+    if site_url:
+        headers['HTTP-Referer'] = site_url
+    if site_name:
+        headers['X-Title'] = site_name
+    return headers
+
+
+def _compatible_embedding(config) -> BaseEmbedding:
     return OpenAIEmbedding(
-        api_key=config.openrouter_api_key,
-        api_base=config.openrouter_base_url,
-        model=config.openrouter_embedding_model,
-        default_headers={
-            'HTTP-Referer': config.openrouter_site_url,
-            'X-Title': config.openrouter_site_name,
-        },
+        api_key=getattr(config, 'llm_api_key', 'ollama'),
+        api_base=getattr(config, 'llm_base_url', 'http://localhost:11434/v1'),
+        model=getattr(config, 'llm_embedding_model', 'nomic-ai/nomic-embed-text-v1.5'),
+        default_headers=_compatible_headers(config),
     )
 
 
 def llm_component(config) -> LLM:
-    return _openrouter_llm(config)
+    return _compatible_llm(config)
 
 
 def embedding_component(config) -> BaseEmbedding:
-    return _openrouter_embedding(config)
+    return _compatible_embedding(config)
 
 
 def index_store_component() -> BaseIndexStore:

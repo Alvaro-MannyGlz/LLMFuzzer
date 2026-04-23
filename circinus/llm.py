@@ -10,25 +10,30 @@ class GPT:
     def __init__(self, config=None):
         config = config or settings
         self.llm = openai.OpenAI(
-            api_key=config.openrouter_api_key,
-            base_url=config.openrouter_base_url,
-            default_headers={
-                'HTTP-Referer': config.openrouter_site_url,
-                'X-Title': config.openrouter_site_name,
-            },
+            api_key=getattr(config, 'llm_api_key', 'ollama'),
+            base_url=getattr(config, 'llm_base_url', 'http://localhost:11434/v1'),
+            default_headers=self._default_headers(config),
         )
-        self.model = config.openrouter_api_model
-        configured_fallbacks = getattr(config, 'openrouter_fallback_models', None)
+        self.model = getattr(config, 'llm_model', 'llama3.1')
+        configured_fallbacks = getattr(config, 'llm_fallback_models', None)
         self.fallback_models = self._normalize_fallback_models(configured_fallbacks)
-        self.max_tokens = config.max_tokens
+        self.max_tokens = getattr(config, 'max_tokens', 2048)
         self.temperature = 0
 
     @staticmethod
+    def _default_headers(config) -> dict[str, str]:
+        headers = {}
+        site_url = getattr(config, 'llm_site_url', None)
+        site_name = getattr(config, 'llm_site_name', None)
+        if site_url:
+            headers['HTTP-Referer'] = site_url
+        if site_name:
+            headers['X-Title'] = site_name
+        return headers
+
+    @staticmethod
     def _normalize_fallback_models(configured_fallbacks) -> list[str]:
-        defaults = [
-            'mistralai/mistral-7b-instruct:free',
-            'google/gemma-2-9b-it:free',
-        ]
+        defaults = ['qwen3.5', 'llama3.1', 'mistral']
         if configured_fallbacks is None:
             return defaults
         if isinstance(configured_fallbacks, str):

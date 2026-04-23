@@ -10,51 +10,31 @@
 pip install circinus
 ```
 
-## OpenRouter Setup
+## LLM Setup
 
-Circinus now uses live OpenRouter-backed model calls (mock mode was removed).
+Circinus now uses OpenAI-compatible model calls with a local Ollama-first default.
 
-Set your API key before running the CLI, agent, or notebook demos.
-
-PowerShell:
+Copy the example environment file and edit it for your setup:
 
 ```powershell
-$env:OPENROUTER_API_KEY="your_openrouter_key"
+Copy-Item .env.example .env
 ```
 
-The tracked template is `notebook/conf.example.toml`. Create your local config from it:
+Then set your preferred model backend. The defaults are tuned for Ollama, but any OpenAI-compatible endpoint should work.
+
+Typical local Ollama values:
 
 ```powershell
-Copy-Item notebook/conf.example.toml notebook/conf.toml
+$env:LLM_API_KEY="ollama"
+$env:LLM_BASE_URL="http://localhost:11434/v1"
+$env:LLM_MODEL="llama3.1"
 ```
 
-Then edit `notebook/conf.toml` as needed. Default values are:
-
-```toml
-openrouter_api_key='${OPENROUTER_API_KEY}'
-openrouter_api_model='meta-llama/llama-3.1-8b-instruct:free'
-openrouter_fallback_models=['mistralai/mistral-7b-instruct:free', 'google/gemma-2-9b-it:free']
-openrouter_embedding_model='nomic-ai/nomic-embed-text-v1.5'
-openrouter_base_url='https://openrouter.ai/api/v1'
-openrouter_site_url='https://github.com/PrVrSs/circinus'
-openrouter_site_name='circinus'
-max_tokens=2048
-```
-
-Recommended free chat models to try:
-
-1. `meta-llama/llama-3.1-8b-instruct:free` (default suggestion)
-2. `mistralai/mistral-7b-instruct:free` or `google/gemma-2-9b-it:free`
-
-To switch models, change `openrouter_api_model` in `notebook/conf.toml`.
-
-If OpenRouter returns `404 No endpoints found` for the primary model, Circinus automatically retries models listed in `openrouter_fallback_models`.
-
-Note: OpenRouter free model availability can change over time by provider/queue status.
+The example `.env` file also lists other model options you can swap in, including `qwen3.5`, `mistral`, `gemma`, and `deepseek`-style local variants.
 
 ## Quick Start
 
-1. Export `OPENROUTER_API_KEY`.
+1. Set the `.env` values for your local model or compatible endpoint.
 2. Run the notebook demo in `notebook/webidl.ipynb`, or run the CLI:
 
 ```shell
@@ -64,6 +44,47 @@ python -m circinus \
 	--code notebook/blob.js \
 	--output notebook/demo_files
 ```
+
+## Circinus to AFL++ Pipeline
+
+Circinus can now generate context-aware seed files and hand them directly to AFL++ as the initial corpus.
+
+Example:
+
+```shell
+python -m circinus \
+	--documentation notebook/blob_documentation.txt \
+	--specification notebook/blob.webidl \
+	--code notebook/blob.js \
+	--output notebook/demo_files/seeds \
+	--afl \
+	--afl-target-cmd "python target.py @@" \
+	--afl-output-dir notebook/demo_files/afl_findings \
+	--afl-extra-args=-m \
+	--afl-extra-args=none
+```
+
+This flow uses Circinus for semantic seed generation and AFL++ for high-throughput mutation and crash discovery.
+
+## Automated Vulnerability Reporter (Ollama)
+
+You can convert raw crash artifacts (for example AFL++ `crashes/` output) into plain-English findings with an Ollama model.
+
+Example:
+
+```shell
+python -m circinus \
+	--documentation notebook/blob_documentation.txt \
+	--specification notebook/blob.webidl \
+	--code notebook/blob.js \
+	--output notebook/demo_files/seeds \
+	--crash-data notebook/demo_files/afl_findings/default/crashes \
+	--vuln-report notebook/demo_files/vulnerability_report.md \
+	--ollama-model llama3.1 \
+	--ollama-base-url http://localhost:11434/v1
+```
+
+By default, if `--vuln-report` is omitted, Circinus writes `vulnerability_report.md` inside `--output`.
 
 ## Examples
 
