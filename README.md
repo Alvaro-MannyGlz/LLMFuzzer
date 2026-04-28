@@ -4,40 +4,62 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/PrVrSs/circinus/blob/master/LICENSE)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue)](https://www.python.org/)
 
+## System Requirements
+
+### Minimum project requirements
+
+These requirements apply to Circinus itself:
+
+- Windows PowerShell or Command Prompt
+- Python 3.10 or newer
+- enough free disk space for Python dependencies and any local model assets you choose to install
+
+### Ollama platform notes
+
+According to the official Ollama documentation:
+
+- Ollama is available for Windows, macOS, and Linux
+- the local Ollama service listens on `http://localhost:11434`
+- Circinus uses the OpenAI-compatible local endpoint at `http://localhost:11434/v1`
+- no authentication is required for local API access on `http://localhost:11434`
+- on Windows, Ollama reads standard user and system environment variables
+
+### Ollama hardware guidance
+
+Official Ollama documentation explains that loaded models may run fully on GPU, fully in system memory, or split across CPU and GPU, and that actual memory use depends on the model you choose. The exact hardware requirement therefore depends primarily on model size.
+
+Practical guidance for Circinus users:
+
+- For small local coding models, 16 GB system RAM is a reasonable starting point
+- For smoother local work, 32 GB RAM is strongly preferred
+- A dedicated GPU helps significantly, especially for larger models and faster response times
+- If you do not have a capable GPU, Ollama can still run on CPU, but generation will be slower
+- Larger models require substantially more RAM or VRAM and may be impractical on entry-level hardware
+
+Conservative model guidance:
+
+- `qwen3.5` or similar small local models are the easiest place to start on consumer hardware
+- mid-size models usually benefit from 16 GB to 24 GB of available VRAM, or enough combined GPU and system memory for mixed CPU/GPU loading
+- very large models are generally not a practical default for local fuzzing workflows unless you already have a high-memory workstation
+
+This guidance is an implementation recommendation based on Ollama's documented runtime behavior and common model sizes. It is not an official Ollama sizing table.
+
 ## Installation
 
-```shell script
-pip install circinus
-```
-
-## LLM Setup
-
-Circinus now uses OpenAI-compatible model calls with a local Ollama-first default.
-
-Copy the example environment file and edit it for your setup:
+From the repository root:
 
 ```powershell
-Copy-Item .env.example .env
+python -m pip install -e .
+copy .env.example .env
 ```
 
-Then set your preferred model backend. The defaults are tuned for Ollama, but any OpenAI-compatible endpoint should work.
-
-Typical local Ollama values:
-
-```powershell
-$env:LLM_API_KEY="ollama"
-$env:LLM_BASE_URL="http://localhost:11434/v1"
-$env:LLM_MODEL="llama3.1"
-```
-
-The example `.env` file also lists other model options you can swap in, including `qwen3.5`, `mistral`, `gemma`, and `deepseek`-style local variants.
+Editing `.env` is optional. Circinus can use the defaults in `.env.example` or environment variables directly when it starts.
 
 ## Quick Start
 
-1. Set the `.env` values for your local model or compatible endpoint.
-2. Run the notebook demo in `notebook/webidl.ipynb`, or run the CLI:
+Start Circinus from the repository root:
 
-```shell
+```powershell
 python -m circinus \
 	--documentation notebook/blob_documentation.txt \
 	--specification notebook/blob.webidl \
@@ -45,13 +67,87 @@ python -m circinus \
 	--output notebook/demo_files
 ```
 
-## Circinus to AFL++ Pipeline
+Or run the notebook demo in `notebook/webidl.ipynb`.
 
-Circinus can now generate context-aware seed files and hand them directly to AFL++ as the initial corpus.
+When Circinus starts, it uses the configured LLM backend from `.env` or `notebook/conf.toml`.
+
+## How To Use Ollama With Circinus
+
+### 1. Install Ollama
+
+Install Ollama from the official download page:
+
+- [Ollama Downloads](https://ollama.com/download)
+
+After installation, make sure the Ollama application or service is running.
+
+### 2. Pull a local model
+
+For a lightweight starting point:
+
+```powershell
+ollama pull qwen3.5
+```
+
+You can verify that the model is available with:
+
+```powershell
+ollama list
+```
+
+### 3. Start the Ollama server
+
+If Ollama is not already running in the background, start it with:
+
+```powershell
+ollama serve
+```
+
+The default local API base URL used by Circinus is:
+
+```text
+http://localhost:11434/v1
+```
+
+### 4. Configure Circinus for Ollama
+
+The simplest local settings are:
+
+```powershell
+$env:LLM_API_KEY="ollama"
+$env:LLM_BASE_URL="http://localhost:11434/v1"
+$env:LLM_MODEL="qwen3.5"
+```
+
+Or edit `.env` directly.
+
+Circinus also supports other local or OpenAI-compatible model options through the same settings:
+
+1. `qwen3.5`
+2. `llama3.1`
+3. `mistral`
+4. `gemma`
+5. `deepseek`-style local variants
+
+### 5. Run Circinus with Ollama
+
+```powershell
+python -m circinus \
+	--documentation notebook/blob_documentation.txt \
+	--specification notebook/blob.webidl \
+	--code notebook/blob.js \
+	--output notebook/demo_files
+```
+
+Circinus will point the bundled client at your local Ollama-compatible endpoint.
+
+## AFL++ Pipeline
+
+Circinus can generate context-aware seed files and hand them directly to AFL++ as the initial corpus.
 
 Example:
 
-```shell
+```powershell
 python -m circinus \
 	--documentation notebook/blob_documentation.txt \
 	--specification notebook/blob.webidl \
@@ -66,13 +162,19 @@ python -m circinus \
 
 This flow uses Circinus for semantic seed generation and AFL++ for high-throughput mutation and crash discovery.
 
-## Automated Vulnerability Reporter (Ollama)
+## Seed Cache
 
-You can convert raw crash artifacts (for example AFL++ `crashes/` output) into plain-English findings with an Ollama model.
+Circinus can persist crash-derived seeds to `.circinus-seed-cache.json` between runs.
+
+When the cache file exists, Circinus loads those seeds first and writes them into the current output directory before generating new ones. If crash artifacts are available from a run, Circinus stores them back into the cache so the next run can start from known bug-triggering inputs.
+
+## Automated Vulnerability Reporter
+
+You can convert raw crash artifacts, such as AFL++ `crashes/` output, into plain-English findings with an Ollama model.
 
 Example:
 
-```shell
+```powershell
 python -m circinus \
 	--documentation notebook/blob_documentation.txt \
 	--specification notebook/blob.webidl \
@@ -80,7 +182,7 @@ python -m circinus \
 	--output notebook/demo_files/seeds \
 	--crash-data notebook/demo_files/afl_findings/default/crashes \
 	--vuln-report notebook/demo_files/vulnerability_report.md \
-	--ollama-model llama3.1 \
+	--ollama-model qwen3.5 \
 	--ollama-base-url http://localhost:11434/v1
 ```
 
