@@ -1,8 +1,9 @@
 llm_api_key='ollama'
-llm_model='llama3.1'
+llm_model='qwen3'
 llm_fallback_models=['qwen3.5', 'mistral', 'gemma']
 llm_embedding_model='nomic-ai/nomic-embed-text-v1.5'
 llm_base_url='http://localhost:11434/v1'
 llm_site_url='https://github.com/PrVrSs/circinus'
 llm_site_name='circinus'
+llm_timeout=120
 max_tokens=2048

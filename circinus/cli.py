@@ -115,7 +115,7 @@ def _default_config_path() -> Path:
 )
 @click.option(
     '--ollama-model',
-    default='llama3.1',
+    default='qwen3',
     show_default=True,
     help='Ollama model name for vulnerability reporting.',
 )

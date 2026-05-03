@@ -14,10 +14,11 @@ class GPT:
             base_url=getattr(config, 'llm_base_url', 'http://localhost:11434/v1'),
             default_headers=self._default_headers(config),
         )
-        self.model = getattr(config, 'llm_model', 'llama3.1')
+        self.model = getattr(config, 'llm_model', 'qwen3')
         configured_fallbacks = getattr(config, 'llm_fallback_models', None)
         self.fallback_models = self._normalize_fallback_models(configured_fallbacks)
         self.max_tokens = getattr(config, 'max_tokens', 2048)
+        self.timeout = getattr(config, 'llm_timeout', 120)
         self.temperature = 0
 
     @staticmethod
@@ -33,7 +34,7 @@ class GPT:
 
     @staticmethod
     def _normalize_fallback_models(configured_fallbacks) -> list[str]:
-        defaults = ['qwen3.5', 'llama3.1', 'mistral']
+        defaults = ['qwen3', 'qwen3.5', 'llama3.1', 'mistral']
         if configured_fallbacks is None:
             return defaults
         if isinstance(configured_fallbacks, str):
@@ -63,9 +64,9 @@ class GPT:
                 rsp = self.llm.chat.completions.create(**self._cons_kwargs(message, model=model))
                 return rsp.choices[0].message.content
             except openai.NotFoundError as exc:
-                is_no_endpoint = 'No endpoints found' in str(exc)
                 is_last_model = index == len(models) - 1
-                if is_no_endpoint and not is_last_model:
+                # If one model is unavailable locally, try the next configured fallback.
+                if not is_last_model:
                     continue
                 raise
 
@@ -76,6 +77,6 @@ class GPT:
             'n': 1,
             'stop': None,
             'temperature': self.temperature,
-            'timeout': 3,
+            'timeout': self.timeout,
             'model': model or self.model
         }
