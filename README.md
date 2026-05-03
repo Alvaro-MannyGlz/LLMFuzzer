@@ -14,6 +14,13 @@ These requirements apply to Circinus itself:
 - Python 3.10 or newer
 - enough free disk space for Python dependencies and any local model assets you choose to install
 
+Optional, only needed for the AFL++ handoff pipeline:
+
+- AFL++ installed separately in a Linux-compatible environment such as WSL or a Linux VM
+- a target program you can run with an input-file placeholder such as `@@`
+
+If you are on Windows and want to use the AFL++ pipeline, install WSL or another Linux environment first. Circinus itself runs on Windows, but AFL++ does not ship with this project and must be available separately.
+
 ### Ollama platform notes
 
 According to the official Ollama documentation:
@@ -144,6 +151,12 @@ Circinus will point the bundled client at your local Ollama-compatible endpoint.
 ## AFL++ Pipeline
 
 Circinus can generate context-aware seed files and hand them directly to AFL++ as the initial corpus.
+
+Before using this pipeline, install AFL++ separately in your Linux environment. On Ubuntu, for example:
+
+```bash
+sudo apt install afl++
+```
 
 Example:
 
