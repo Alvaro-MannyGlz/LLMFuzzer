@@ -1,0 +1,68 @@
+import random
+
+def main():
+    # 1. Random Number
+    num = random.randint(1, 10)           # Integer between 1 and 10 (inclusive)
+    print(f"Random number (1-10): {num}")
+
+    # 2. Random Integer Range with Step
+    step_num = random.randrange(0, 100, 3)  # Numbers from 0 to 99, step of 3
+    print(f"Random number with step: {step_num}")
+
+    # 3. Random Float
+    float_num = random.random()            # Float between 0.0 and 1.0
+    print(f"Random float: {float_num}")
+
+    # 4. Random Float Range
+    float_range = random.uniform(5.0, 15.0)
+    print(f"Random float (5.0-15.0): {float_range}")
+
+    # 5. Random Choice from List
+    items = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry']
+    chosen_item = random.choice(items)
+    print(f"Random item from list: {chosen_item}")
+
+    # 6. Choice with Weights
+    fruits = ['Apple', 'Banana', 'Cherry']
+    weights = [0.4, 0.4, 0.2]
+    weighted_fruit = random.choices(fruits, weights=weights, k=1)[0]
+    print(f"Weighted random fruit: {weighted_fruit}")
+
+    # 7. Sample Multiple Items (Unique)
+    selection = random.sample(items, 3)
+    print(f"Random sample (unique): {selection}")
+
+    # 8. Shuffle List
+    deck = list(range(1, 11))
+    random.shuffle(deck)
+    print(f"Shuffled deck: {deck}")
+
+    # 9. Generating Random Integers in Bulk
+    random_ints = [random.randint(1, 100) for _ in range(5)]
+    print(f"List of random integers: {random_ints}")
+
+    # 10. Random Gaussian Distribution (Bell Curve)
+    gaussian_num = random.gauss(0, 1)
+    print(f"Gaussian number: {gaussian_num}")
+
+    # 11. Pick Multiple Items Without Replacement
+    picked = random.sample(items, 2)
+    print(f"Random picked items: {picked}")
+
+    # 12. Simulating Coin Flips
+    coin = random.choice(['Heads', 'Tails'])
+    print(f"Coin flip: {coin}")
+
+    # 13. Simulating Dice Rolling
+    roll = random.randint(1, 6)
+    print(f"Dice roll: {roll}")
+
+    # 14. Random Color Generator
+    color = random.choice([
+        'Red', 'Blue', 'Green', 'Yellow', 'Purple',
+        'Orange', 'Pink', 'Black', 'White'
+    ])
+    print(f"Random color: {color}")
+
+if __name__ == "__main__":
+    main()

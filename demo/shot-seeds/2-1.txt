@@ -1,0 +1,18 @@
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // Example 1: Generate a random integer between 1 and 100
+        Random random = new Random();
+        int randomInt = random.Next(1, 101); // 101 is exclusive, so max is 100
+        Console.WriteLine("Random Integer: " + randomInt);
+
+        // Example 2: Select a random element from a list
+        List<string> fruits = new List<string> { "Apple", "Banana", "Cherry", "Date" };
+        string randomFruit = fruits[random.Next(fruits.Count)];
+        Console.WriteLine("Random Fruit: " + randomFruit);
+    }
+}

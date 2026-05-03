@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "generated_utc": "2026-04-28T00:00:00+00:00",
+  "seeds": [
+    {
+      "source": "manual-demo",
+      "content": "CRASH",
+      "content_hash": "0"
+    },
+    {
+      "source": "manual-demo",
+      "content": "hello from cache",
+      "content_hash": "1"
+    }
+  ]
+}

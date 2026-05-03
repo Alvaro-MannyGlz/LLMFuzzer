@@ -1,0 +1,24 @@
+import java.util.Random;
+
+public class RandomNumberGenerator {
+    public static void main(String[] args) {
+        // Create an instance of the Random class
+        Random random = new Random();
+
+        // Generate and print a random integer between 1 and 100
+        int randomInt = random.nextInt(100) + 1; // +1 to make the upper bound inclusive
+        System.out.println("Random Integer: " + randomInt);
+
+        // Generate and print a random double between 0.0 (inclusive) and 1.0 (exclusive)
+        double randomDouble = random.nextDouble();
+        System.out.println("Random Double: " + randomDouble);
+
+        // Generate and print a random boolean (true or false)
+        boolean randomBool = random.nextBoolean();
+        System.out.println("Random Boolean: " + randomBool);
+
+        // Example: Generate a random number between 50 and 150
+        int customRange = random.nextInt(101) + 50; // 101 ensures 0-100, +50 shifts to 50-150
+        System.out.println("Custom Range Number: " + customRange);
+    }
+}

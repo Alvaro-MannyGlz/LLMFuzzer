@@ -1,0 +1,9 @@
+CRAusing System;
+
+class Program
+{
+    static void Main()
+    {
+        Random random = new Random();
+        int randomNumber = random.Next(1, 101); // Generates a number between 1 and 100 inclusive
+        Console.WriteLine("Random number: " + randomNumber)ÿÿÿ   }

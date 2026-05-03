@@ -1,0 +1,46 @@
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // Create an instance of the Random class
+        Random random = new Random();
+
+        // Generate and display 10 random integers between 1 and 100
+        Console.WriteLine("Random Numbers between 1 and 100:");
+        for (int i = 0; i < 10; i++)
+        {
+            int randomNumber = random.Next(1, 101); // Next() is inclusive of the first argument and exclusive of the second
+            Console.WriteLine(randomNumber);
+        }
+
+        // Generate a random float between 0.0 and 1.0
+        float randomFloat = random.NextSingle();
+        Console.WriteLine("\nRandom Float: " + randomFloat);
+
+        // Shuffle a list of items
+        List<string> items = new List<string> { "Apple", "Banana", "Cherry", "Date" };
+        random.Shuffle(items); // Custom method to shuffle the list
+        Console.WriteLine("\nShuffled List:");
+        foreach (string item in items)
+        {
+            Console.WriteLine(item);
+        }
+    }
+
+    // Custom method to shuffle a list using the Random class
+    static void Shuffle<T>(List<T> list)
+    {
+        int n = list.Count;
+        Random random = new Random();
+        for (int i = n - 1; i > 0; i--)
+        {
+            int j = random.Next(i + 1);
+            T temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
+    }
+}

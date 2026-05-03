@@ -1,0 +1,176 @@
+// ==========================================
+// 1. BLOB CREATION & BASIC USAGE
+// ==========================================
+
+console.log("=== 1. Blob Creation ===");
+
+// Create a Blob from text data
+const textBlob = new Blob(["Hello, this is a test!"], { 
+    type: "text/plain",
+    endings: "native"
+});
+
+// Create a Blob from binary data (Uint8Array)
+const binaryData = new Uint8Array(100);
+for (let i = 0; i < binaryData.length; i++) {
+    binaryData[i] = i % 256;
+}
+
+const binaryBlob = new Blob([binaryData.buffer], {
+    type: "application/octet-stream",
+    endings: "native"
+});
+
+console.log(`Text Blob Type: ${textBlob.type}`); 
+console.log(`Text Blob Size: ${textBlob.size} bytes`);
+console.log(`Binary Blob Size: ${binaryBlob.size} bytes`);
+
+// Create a mixed Content-Type Blob
+const mixedData = new Blob(["Name: John", "", "Age: 25"], {
+    type: "application/json",
+    endings: "native"
+});
+
+console.log(`Mixed Blob Type: ${mixedData.type}`);
+
+// ==========================================
+// 2. BLOB DATA ACCESS
+// ==========================================
+
+console.log("\n=== 2. Blob Data Access ===");
+
+// Asynchronously read Blob as UTF-8 text
+async function readBlobAsText(blob) {
+    try {
+        const text = await blob.text();
+        console.log(`"Text Content:\n${text}"`);
+    } catch (error) {
+        console.log(`Error reading as text: ${error.message}`);
+    }
+}
+
+// Asynchronously read Blob as binary array buffer
+async function readBlobAsArrayBuffer(blob) {
+    try {
+        const buffer = await blob.arrayBuffer();
+        console.log(`"ArrayBuffer Size: ${buffer.byteLength} bytes"`);
+    } catch (error) {
+        console.log(`Error reading as array buffer: ${error.message}`);
+    }
+}
+
+// Read Blob using ReadableStream API (Web Streams)
+async function readBlobAsStream(blob) {
+    try {
+        const stream = blob.stream();
+        const reader = stream.getReader();
+        
+        let chunk = new Uint8Array(reader.read().value);
+        console.log(`"Stream read ${chunk.byteLength} bytes"`);
+        
+        // Note: full stream reading implementation omitted for brevity
+    } catch (error) {
+        console.log(`Error reading as stream: ${error.message}`);
+    }
+}
+
+// Read and demonstrate Blob data access
+async function demonstrateBlobAccess() {
+    await readBlobAsText(textBlob);
+    await readBlobAsArrayBuffer(binaryBlob);
+    // await readBlobAsStream(binaryBlob); // optional streaming approach
+}
+
+// ==========================================
+// 3. BLOB MANIPULATION
+// ==========================================
+
+console.log("\n=== 3. Blob Manipulation ===");
+
+// Create a large Blob
+const largeData = new Blob(["Line 1\nLine 2\nLine 3\nLine 4\n"], {
+    type: "text/plain"
+});
+
+console.log(`Original Size: ${largeData.size}`);
+
+// Slice Blob to get a subset
+const slicedBlob = largeData.slice(0, 5); // First 5 bytes
+console.log(`Sliced Size: ${slicedBlob.size} bytes`);
+
+// Slice and get middle portion
+const middleSlice = largeData.slice(6, 10); // Middle section
+console.log(`Middle Slice: ${middleSlice.size} bytes`);
+
+// Slice from end of blob
+const endSlice = largeData.slice(-4); // Last 4 bytes
+console.log(`End Slice: ${endSlice.size} bytes`);
+
+// ==========================================
+// 4. CREATING DOWNLOADABLE URLs
+// ==========================================
+
+console.log("\n=== 4. Creating Download URLs ===");
+
+function createDownloadBlob(url, filename, mime) {
+    return new Blob([url], { type: mime });
+}
+
+const textForDownload = createDownloadBlob(
+    "This is downloadable text content!",
+    "download.txt",
+    "text/plain"
+);
+
+console.log(`Blob URL Size: ${textForDownload.size}`);
+
+const downloadUrl = URL.createObjectURL(textForDownload);
+console.log(`Download URL (createObjectURL): ${downloadUrl}`);
+
+// Clean up
+URL.revokeObjectURL(downloadUrl);
+
+// ==========================================
+// 5. ERROR HANDLING & ROBUST BLOB HANDLING
+// ==========================================
+
+console.log("\n=== 5. Error Handling & Safe Blob Usage ===");
+
+async function safeBlobOperations(blobName, blob) {
+    try {
+        // Validate Blob size
+        if (!blob || blob.size === 0) {
+            throw new Error(`${blobName} is empty`);
+        }
+
+        // Validate Blob type
+        if (blob.type === "") {
+            console.log(`${blobName} has no MIME type set`);
+        }
+
+        // Try to read content
+        const text = await blob.text();
+        console.log(`Successfully read ${blobName}: ${text.length} characters`);
+
+        // Clean up after operation
+        const blobUrl = URL.createObjectURL(blob);
+        console.log(`Created Blob URL: ${blobUrl}`);
+        URL.revokeObjectURL(blobUrl);
+
+    } catch (error) {
+        console.log(`Error with ${blobName}: ${error.message}`);
+    }
+}
+
+// Test error handling
+setTimeout(async () => {
+    // Safe operations - should not throw errors
+    await safeBlobOperations("Original Blob", largeData);
+    
+    // Safe operations even after slice
+    await safeBlobOperations("Sliced Blob", slicedBlob);
+
+    // Test empty blob handling
+    const emptyBlob = new Blob([], { type: "text/plain" });
+    await safeBlobOperations("Empty Blob", emptyBlob);
+}, 100);

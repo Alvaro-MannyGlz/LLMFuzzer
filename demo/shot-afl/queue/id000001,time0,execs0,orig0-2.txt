@@ -1,0 +1,36 @@
+import java.util.Random;
+
+public class RandomExample {
+    public static void main(String[] args) {
+        // Create an instance of the Random class
+        Random random = new Random();
+
+        // Generate random integers
+        System.out.println("Random integers between 1 and 100:");
+        for (int i = 0; i < 5; i++) {
+            int randomInt = random.nextInt(100) + 1; // 1-100 inclusive
+            System.out.print(randomInt + " ");
+        }
+        System));
+        
+        // Generate random doubles between 0.0 and 1.0
+        System.out.println("\n\nRandom doubles between 0.0 and 1.0:");
+        for (int i = 0; i < 5; i++) {
+            double randomDouble = random.nextDouble();
+            System.out.print(randomDouble + " ");
+        }
+        
+        // Generate random booleans
+        System.out.println("\n\nRandom booleans:");
+        for (int i = 0; i < 5; i++) {
+            boolean randomBool = random.nextBoolean();
+            System.out.print(randomBool + " ");
+        }
+        
+        // Select a random element from a list
+        System.out.println("\n\nRandom fruit from list:");
+        String[] fruits = {"Apple", "Banana", "Cherry", "Date", "Elderberry"};
+        int randomIndex = random.nextInt(fruits.length);
+        System.out.println(fruits[randomIndex]);
+    }
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Random Blob Example</title>
+</head>
+<body>
+  <h2>Random Blob Example</h2>
+  <script>
+    // 📌 Step 1: Generate Random Binary Data
+    const size = 1024; // 1KB of random bytes
+    const buffer = new Uint8Array(size);
+
+    for (let i = 0; i < buffer.length; i++) {
+      buffer[i] = Math.floor(Math.random() * 256); // Random byte values
+    }
+
+    // 📌 Step 2: Create a Blob from the Random Data
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+
+    // 📌 Step 3: Demonstrate Blob Properties and Methods
+    console.log("Blob Size:", blob.size);
+    console.log("Blob MIME Type:", blob.type);
+
+    // 📌 arrayBuffer() - Get binary data
+    blob.arrayBuffer().then(arrayBuffer => {
+      console.log("ArrayBuffer Size:", arrayBuffer.byteLength);
+    });
+
+    // 📌 text() - Convert to UTF-8 text (may include replacement characters)
+    blob.text().then(text => {
+      console.log("Text Content (UTF-8):", text);
+    });
+
+    // 📌 slice() - Create a new Blob for a portion of the data
+    const slicedBlob = blob.slice(0, 512); // First 512 bytes
+    console.log("Sliced Blob Size:", slicedBlob.size);
+
+    // 📌 stream() - Expose data as a ReadableStream
+    const stream = blob.stream();
+    console.log("ReadableStream:", stream);
+
+    // 📌 Step 4: Generate a Downloadable File
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = URL.createObjectURL(blob);
+    downloadAnchor.download = 'random_data.bin';
+    downloadAnchor.click();
+
+    // 📌 Cleanup: Remove download link after click
+    setTimeout(() => {
+      URL.revokeObjectURL(downloadAnchor.href);
+    }, 100);
+  </script>
+</body>
+</html>
